@@ -4,428 +4,438 @@ import { ToastContainer, toast } from 'react-toastify';
 import styled, { css, keyframes } from 'styled-components';
 import { FaEthereum } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
+import TransactionLink from './components/TransactionLink';
 import './App.css';
 
-const CONTRACT_ADDRESS = '0x5017D26FA546a1F469d640483f766C4664BeFB69';
-const TOKEN_ADDRESS = '0x6718d3cBE780CaB35cd7eC623f8152Cd4A7289Bd';
-const CONTRACT_ABI = [
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "player",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "won",
-        "type": "bool"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "headsChosen",
-        "type": "bool"
-      }
-    ],
-    "name": "CoinFlipped",
-    "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "token",
-    "outputs": [
-      {
-        "internalType": "contract IERC20",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "heads",
-        "type": "bool"
-      }
-    ],
-    "name": "flip",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-]; 
-const TOKEN_ABI = [
-  {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "allowance",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "needed",
-        "type": "uint256"
-      }
-    ],
-    "name": "ERC20InsufficientAllowance",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "balance",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "needed",
-        "type": "uint256"
-      }
-    ],
-    "name": "ERC20InsufficientBalance",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "approver",
-        "type": "address"
-      }
-    ],
-    "name": "ERC20InvalidApprover",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "receiver",
-        "type": "address"
-      }
-    ],
-    "name": "ERC20InvalidReceiver",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
-    ],
-    "name": "ERC20InvalidSender",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      }
-    ],
-    "name": "ERC20InvalidSpender",
-    "type": "error"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Approval",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      }
-    ],
-    "name": "allowance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "approve",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "decimals",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "name",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [],
-    "name": "totalSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "transfer",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferFrom",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-]; // Add ERC20 token ABI here
+const CONTRACT_ADDRESS = '0xDfd7817fe62E1FCFf7e1B14B87E0439521Ed2f84';
+//const TOKEN_ADDRESS = '0x6718d3cBE780CaB35cd7eC623f8152Cd4A7289Bd';
+const CONTRACT_ABI = [{
+  "inputs": [],
+  "stateMutability": "payable",
+  "type": "constructor",
+  "payable": true
+},
+{
+  "anonymous": false,
+  "inputs": [
+    {
+      "indexed": false,
+      "internalType": "address",
+      "name": "player",
+      "type": "address"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "amount",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "internalType": "bool",
+      "name": "won",
+      "type": "bool"
+    },
+    {
+      "indexed": false,
+      "internalType": "bool",
+      "name": "headsChosen",
+      "type": "bool"
+    }
+  ],
+  "name": "CoinFlipped",
+  "type": "event"
+},
+{
+  "inputs": [],
+  "name": "contractBalance",
+  "outputs": [
+    {
+      "internalType": "uint256",
+      "name": "",
+      "type": "uint256"
+    }
+  ],
+  "stateMutability": "view",
+  "type": "function",
+  "constant": true
+},
+{
+  "inputs": [],
+  "name": "owner",
+  "outputs": [
+    {
+      "internalType": "address",
+      "name": "",
+      "type": "address"
+    }
+  ],
+  "stateMutability": "view",
+  "type": "function",
+  "constant": true
+},
+{
+  "stateMutability": "payable",
+  "type": "receive",
+  "payable": true
+},
+{
+  "inputs": [
+    {
+      "internalType": "bool",
+      "name": "heads",
+      "type": "bool"
+    }
+  ],
+  "name": "flip",
+  "outputs": [],
+  "stateMutability": "payable",
+  "type": "function",
+  "payable": true
+},
+{
+  "inputs": [],
+  "name": "withdraw",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+},
+{
+  "inputs": [],
+  "name": "getContractBalance",
+  "outputs": [
+    {
+      "internalType": "uint256",
+      "name": "",
+      "type": "uint256"
+    }
+  ],
+  "stateMutability": "view",
+  "type": "function",
+  "constant": true
+}
+];
+// const TOKEN_ABI = [
+//   {
+//     "inputs": [],
+//     "stateMutability": "nonpayable",
+//     "type": "constructor"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "spender",
+//         "type": "address"
+//       },
+//       {
+//         "internalType": "uint256",
+//         "name": "allowance",
+//         "type": "uint256"
+//       },
+//       {
+//         "internalType": "uint256",
+//         "name": "needed",
+//         "type": "uint256"
+//       }
+//     ],
+//     "name": "ERC20InsufficientAllowance",
+//     "type": "error"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "sender",
+//         "type": "address"
+//       },
+//       {
+//         "internalType": "uint256",
+//         "name": "balance",
+//         "type": "uint256"
+//       },
+//       {
+//         "internalType": "uint256",
+//         "name": "needed",
+//         "type": "uint256"
+//       }
+//     ],
+//     "name": "ERC20InsufficientBalance",
+//     "type": "error"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "approver",
+//         "type": "address"
+//       }
+//     ],
+//     "name": "ERC20InvalidApprover",
+//     "type": "error"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "receiver",
+//         "type": "address"
+//       }
+//     ],
+//     "name": "ERC20InvalidReceiver",
+//     "type": "error"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "sender",
+//         "type": "address"
+//       }
+//     ],
+//     "name": "ERC20InvalidSender",
+//     "type": "error"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "spender",
+//         "type": "address"
+//       }
+//     ],
+//     "name": "ERC20InvalidSpender",
+//     "type": "error"
+//   },
+//   {
+//     "anonymous": false,
+//     "inputs": [
+//       {
+//         "indexed": true,
+//         "internalType": "address",
+//         "name": "owner",
+//         "type": "address"
+//       },
+//       {
+//         "indexed": true,
+//         "internalType": "address",
+//         "name": "spender",
+//         "type": "address"
+//       },
+//       {
+//         "indexed": false,
+//         "internalType": "uint256",
+//         "name": "value",
+//         "type": "uint256"
+//       }
+//     ],
+//     "name": "Approval",
+//     "type": "event"
+//   },
+//   {
+//     "anonymous": false,
+//     "inputs": [
+//       {
+//         "indexed": true,
+//         "internalType": "address",
+//         "name": "from",
+//         "type": "address"
+//       },
+//       {
+//         "indexed": true,
+//         "internalType": "address",
+//         "name": "to",
+//         "type": "address"
+//       },
+//       {
+//         "indexed": false,
+//         "internalType": "uint256",
+//         "name": "value",
+//         "type": "uint256"
+//       }
+//     ],
+//     "name": "Transfer",
+//     "type": "event"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "owner",
+//         "type": "address"
+//       },
+//       {
+//         "internalType": "address",
+//         "name": "spender",
+//         "type": "address"
+//       }
+//     ],
+//     "name": "allowance",
+//     "outputs": [
+//       {
+//         "internalType": "uint256",
+//         "name": "",
+//         "type": "uint256"
+//       }
+//     ],
+//     "stateMutability": "view",
+//     "type": "function",
+//     "constant": true
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "spender",
+//         "type": "address"
+//       },
+//       {
+//         "internalType": "uint256",
+//         "name": "value",
+//         "type": "uint256"
+//       }
+//     ],
+//     "name": "approve",
+//     "outputs": [
+//       {
+//         "internalType": "bool",
+//         "name": "",
+//         "type": "bool"
+//       }
+//     ],
+//     "stateMutability": "nonpayable",
+//     "type": "function"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "account",
+//         "type": "address"
+//       }
+//     ],
+//     "name": "balanceOf",
+//     "outputs": [
+//       {
+//         "internalType": "uint256",
+//         "name": "",
+//         "type": "uint256"
+//       }
+//     ],
+//     "stateMutability": "view",
+//     "type": "function",
+//     "constant": true
+//   },
+//   {
+//     "inputs": [],
+//     "name": "decimals",
+//     "outputs": [
+//       {
+//         "internalType": "uint8",
+//         "name": "",
+//         "type": "uint8"
+//       }
+//     ],
+//     "stateMutability": "view",
+//     "type": "function",
+//     "constant": true
+//   },
+//   {
+//     "inputs": [],
+//     "name": "name",
+//     "outputs": [
+//       {
+//         "internalType": "string",
+//         "name": "",
+//         "type": "string"
+//       }
+//     ],
+//     "stateMutability": "view",
+//     "type": "function",
+//     "constant": true
+//   },
+//   {
+//     "inputs": [],
+//     "name": "symbol",
+//     "outputs": [
+//       {
+//         "internalType": "string",
+//         "name": "",
+//         "type": "string"
+//       }
+//     ],
+//     "stateMutability": "view",
+//     "type": "function",
+//     "constant": true
+//   },
+//   {
+//     "inputs": [],
+//     "name": "totalSupply",
+//     "outputs": [
+//       {
+//         "internalType": "uint256",
+//         "name": "",
+//         "type": "uint256"
+//       }
+//     ],
+//     "stateMutability": "view",
+//     "type": "function",
+//     "constant": true
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "to",
+//         "type": "address"
+//       },
+//       {
+//         "internalType": "uint256",
+//         "name": "value",
+//         "type": "uint256"
+//       }
+//     ],
+//     "name": "transfer",
+//     "outputs": [
+//       {
+//         "internalType": "bool",
+//         "name": "",
+//         "type": "bool"
+//       }
+//     ],
+//     "stateMutability": "nonpayable",
+//     "type": "function"
+//   },
+//   {
+//     "inputs": [
+//       {
+//         "internalType": "address",
+//         "name": "from",
+//         "type": "address"
+//       },
+//       {
+//         "internalType": "address",
+//         "name": "to",
+//         "type": "address"
+//       },
+//       {
+//         "internalType": "uint256",
+//         "name": "value",
+//         "type": "uint256"
+//       }
+//     ],
+//     "name": "transferFrom",
+//     "outputs": [
+//       {
+//         "internalType": "bool",
+//         "name": "",
+//         "type": "bool"
+//       }
+//     ],
+//     "stateMutability": "nonpayable",
+//     "type": "function"
+//   }
+// ]; // Add ERC20 token ABI here
 
 const ethereumGradient = 'linear-gradient(135deg, #6b7cb9 0%, #3c3c3d 100%)';
 
@@ -591,17 +601,20 @@ const EthereumIcon = styled(FaEthereum)`
   margin-bottom: 1rem;
 `;
 
+
+
 function App() {
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
-  const [token, setToken] = useState(null);
-  const [amount, setAmount] = useState('');
+  const [contractBalance, setContractBalance] = useState('0');
+  const [amount, setAmount] = useState(0.01);
   const [side, setSide] = useState('heads');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [balance, setBalance] = useState('0');
   const [flipping, setFlipping] = useState(false);
   const [displayResult, setDisplayResult] = useState('Ξ');
+  const [txHash, setTxHash] = useState(null);
 
   useEffect(() => {
     initWeb3();
@@ -617,13 +630,14 @@ function App() {
         const contractInstance = new web3Instance.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
         setContract(contractInstance);
 
-        const tokenInstance = new web3Instance.eth.Contract(TOKEN_ABI, TOKEN_ADDRESS);
-        setToken(tokenInstance);
+        // const tokenInstance = new web3Instance.eth.Contract(TOKEN_ABI, TOKEN_ADDRESS);
+        // setToken(tokenInstance);
 
         const accounts = await web3Instance.eth.getAccounts();
-        updateBalance(accounts[0], tokenInstance);
+        await updateBalance(accounts[0], web3Instance);
+        await updateContractBalance(contractInstance);
 
-        window.ethereum.on('accountsChanged', (accounts) => updateBalance(accounts[0], tokenInstance));
+        window.ethereum.on('accountsChanged', (accounts) => updateBalance(accounts[0], web3Instance));
 
         toast.success('Connected to Web3 successfully');
       } catch (error) {
@@ -637,7 +651,8 @@ function App() {
 
   async function updateBalance(address, tokenInstance) {
     try{
-    const balance = await tokenInstance.methods.balanceOf(address).call();
+    //const balance = await tokenInstance.methods.balanceOf(address).call();
+    const balance = await tokenInstance.eth.getBalance(address);
     setBalance(web3.utils.fromWei(balance, 'ether'));
     }
     catch(error){
@@ -645,6 +660,14 @@ function App() {
     }
   }
 
+  async function updateContractBalance(contractInstance) {
+    try {
+      const balance = await contractInstance.methods.getContractBalance().call();
+      setContractBalance(web3.utils.fromWei(balance, 'ether'));
+    } catch (error) {
+      console.error("Error updating contract balance:", error);
+    }
+  }
 
 
   async function flipCoin() {
@@ -652,55 +675,100 @@ function App() {
       toast.error('Web3 is not initialized. Please connect first.');
       return;
     }
-
+  
     if (!amount) {
       toast.error('Please enter an amount to bet.');
       return;
     }
-
+  
     setLoading(true);
-    setResult(null);
     setFlipping(true);
-    setDisplayResult('')
+    setResult(null);
     try {
       const accounts = await web3.eth.getAccounts();
       const amountWei = web3.utils.toWei(amount, 'ether');
-
-      // Approve the contract to spend tokens
-      await token.methods.approve(CONTRACT_ADDRESS, amountWei).send({ from: accounts[0] });
-
-      // Flip the coin
-      const result = await contract.methods.flip(amountWei, side === 'heads').send({ from: accounts[0] });
-      console.log(result)
-      // Check the event emitted by the contract to determine the result
+  
+      const result = await contract.methods.flip(side === 'heads').send({ 
+        from: accounts[0],
+        value: amountWei
+      });
+      
       const event = result.events.CoinFlipped;
       const won = event.returnValues.won;
+      
+      // Simulate coin flip animation
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
       setResult(won);
-      setDisplayResult(won ? (side.toUpperCase()==='HEADS'? 'Heads': 'Tails'):(side.toUpperCase()==='HEADS'? 'Tails': 'Heads'))
-      updateBalance(accounts[0], token);
-
+      await updateBalance(accounts[0], web3);
+      await updateContractBalance(contract);
+      setTxHash(result.transactionHash);
+  
       toast.success(`Coin flipped! You ${won ? 'won' : 'lost'}!`);
     } catch (error) {
       console.error('Error flipping coin:', error);
       toast.error('Failed to flip coin. Please try again.');
     }
     setLoading(false);
-    
     setFlipping(false);
   }
+  // async function flipCoin() {
+  //   if (!web3 || !contract) {
+  //     toast.error('Web3 is not initialized. Please connect first.');
+  //     return;
+  //   }
+
+  //   if (!amount) {
+  //     toast.error('Please enter an amount to bet.');
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   setResult(null);
+  //   setFlipping(true);
+  //   setDisplayResult('')
+  //   try {
+  //     const accounts = await web3.eth.getAccounts();
+  //     const amountWei = web3.utils.toWei(amount, 'ether');
+
+  //     // Approve the contract to spend tokens
+  //     await token.methods.approve(CONTRACT_ADDRESS, amountWei).send({ from: accounts[0] });
+
+  //     // Flip the coin
+  //     const result = await contract.methods.flip(amountWei, side === 'heads').send({ from: accounts[0] });
+  //     console.log(result)
+  //     // Check the event emitted by the contract to determine the result
+  //     const event = result.events.CoinFlipped;
+  //     const won = event.returnValues.won;
+  //     await new Promise(resolve => setTimeout(resolve, 2000));
+  //     setResult(won);
+  //     setDisplayResult(won ? (side.toUpperCase()==='HEADS'? 'Heads': 'Tails'):(side.toUpperCase()==='HEADS'? 'Tails': 'Heads'))
+  //     updateBalance(accounts[0], token);
+
+  //     toast.success(`Coin flipped! You ${won ? 'won' : 'lost'}!`);
+  //   } catch (error) {
+  //     console.error('Error flipping coin:', error);
+  //     toast.error('Failed to flip coin. Please try again.');
+  //   }
+  //   setLoading(false);
+    
+  //   setFlipping(false);
+  // }
 
   return (
     <AppWrapper>
       <EthereumIcon />
       <Title>Ether Flip</Title>
       <Balance>Your ETH balance: {balance}</Balance>
+      <Balance>Contract ETH balance: {contractBalance}</Balance>
       <InputSelectWrapper>
       <Input
         type="number"
         value={amount}
+        step='0.01'
         onChange={(e) => setAmount(e.target.value)}
-        placeholder="Amount to bet (ETH)"
+        placeholder="Amount to bet (Tokens)"
+        max={balance > 0 ? balance : undefined}
       />
       <Select value={side} onChange={(e) => setSide(e.target.value)}>
         <option value="heads">Heads</option>
@@ -715,6 +783,7 @@ function App() {
       {result !== null && (
         <Result>You {result ? 'won' : 'lost'}!</Result>
       )}
+      <TransactionLink txHash={txHash} />
       <ToastContainer />
     </AppWrapper>
   );
